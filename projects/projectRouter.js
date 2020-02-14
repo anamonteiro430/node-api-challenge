@@ -161,7 +161,7 @@ function bodyExists(req, res, next) {
 		res.status(400).json({ message: 'missing action data' });
 	} else if (!req.body.description) {
 		res.status(400).json({ message: 'missing required description field' });
-	} else if (!req.body.notes) {
+	} else if (!req.body.name) {
 		res.status(400).json({ message: 'missing required notes field' });
 	} else {
 		next();
