@@ -55,7 +55,7 @@ router.delete('/:id', (req, res) => {
 });
 
 //UPDATE ACTION
-router.put('/:id', (req, res) => {
+router.put('/:id', bodyExists, (req, res) => {
 	const { id } = req.params;
 	const changes = req.body;
 	Actions.update(id, changes)
@@ -85,4 +85,27 @@ function idExists(req, res, next) {
 		}
 	});
 }
+
+function bodyExists(req, res, next) {
+	function isEmpty(obj) {
+		for (var key in obj) {
+			if (obj.hasOwnProperty(key)) return false;
+		}
+		return true;
+	}
+
+	const body = { ...req.body };
+	console.log('body', req.body);
+
+	if (isEmpty(req.body)) {
+		res.status(400).json({ message: 'missing action data' });
+	} else if (!req.body.description) {
+		res.status(400).json({ message: 'missing required description field' });
+	} else if (!req.body.notes) {
+		res.status(400).json({ message: 'missing required notes field' });
+	} else {
+		next();
+	}
+}
+
 module.exports = router;

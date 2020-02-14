@@ -58,7 +58,7 @@ router.get('/:id/actions', (req, res) => {
 
 //CREATE PROJECT
 //posting with name works - creates user ✔
-router.post('/', (req, res) => {
+router.post('/', bodyExists, (req, res) => {
 	console.log(req.body);
 	console.log('projectrouter');
 	Projects.insert(req.body)
@@ -75,7 +75,7 @@ router.post('/', (req, res) => {
 
 //CREATE ACTIONS
 //creates action for a project ✔
-router.post('/:id/actions', (req, res) => {
+router.post('/:id/actions', bodyExists, (req, res) => {
 	const project_id = req.params.id;
 	const body = { ...req.body, project_id: project_id };
 	console.log('project_id', project_id);
@@ -110,7 +110,7 @@ router.delete('/:id', (req, res) => {
 });
 
 //UPDATES PROJECTS ✔
-router.put('/:id', (req, res) => {
+router.put('/:id', bodyExists, (req, res) => {
 	const { id } = req.params;
 
 	const changes = req.body;
@@ -144,6 +144,28 @@ function idExists(req, res, next) {
 			res.status(400).json({ message: 'invalid project id' });
 		}
 	});
+}
+
+function bodyExists(req, res, next) {
+	function isEmpty(obj) {
+		for (var key in obj) {
+			if (obj.hasOwnProperty(key)) return false;
+		}
+		return true;
+	}
+
+	const body = { ...req.body };
+	console.log('body', req.body);
+
+	if (isEmpty(req.body)) {
+		res.status(400).json({ message: 'missing action data' });
+	} else if (!req.body.description) {
+		res.status(400).json({ message: 'missing required description field' });
+	} else if (!req.body.notes) {
+		res.status(400).json({ message: 'missing required notes field' });
+	} else {
+		next();
+	}
 }
 
 module.exports = router;
